@@ -104,9 +104,7 @@ docker-compose down -v
 css
 Copiar código
 
-Si querés, puedo hacer también una **versión resumida tipo “chuleta” de comandos de Docker** para tenerla al lado del PC, incluyendo los errores más frecuentes y soluciones rápidas.  
 
-¿Querés que haga esa versión?
 
 
 
