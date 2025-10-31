@@ -11,7 +11,7 @@ class UserService {
 
   async findById(id) {
     // Busca por ID y excluye la contraseña
-    return await this.model.findById(id).select('-password');
+    return await this.model.findOne({ _id: id, estado: 'active' }).select('-password');
   }
 
   async register(data) {
@@ -34,16 +34,16 @@ class UserService {
   }
 
   async login(email, password) {
-    const user = await this.model.findOne({ email }).select('+password');
+    const user = await this.model.findOne({ email, estado: 'active' }).select('+password');
     if (!user) {
       return null;
     }
     const isMatch = await bcrypt.compare(password, user.password);
-    
+
     if (!isMatch) {
-        return null; // Contraseña incorrecta
+      return null; // Contraseña incorrecta
     }
-    
+
     // Generar el Token JWT
     // Se asegura de que el campo 'password' NO esté incluido en el objeto retornado.
     const userWithoutPassword = user.toObject();
@@ -57,18 +57,30 @@ class UserService {
 
 
   async getAll() {
-    return this.model.find().select('-password');
+    //Filtrar solo usuarios 'active' y excluir la contraseña
+    return this.model.find({ estado: 'active' }).select('-password');
   }
-
+  /**
+     * Modifica los datos de un usuario. Solo permite la actualización si el estado es 'active'.
+     * @param {string} userId - ID del usuario a actualizar.
+     * @param {object} updateData - Datos a modificar.
+     * @returns {Promise<object | null>} Usuario actualizado o null.
+     */
 
 
 
   //* modificar nombre usuario 
   async update(userId, updateData) {
     try {
-      const user = await Usuario.findByIdAndUpdate(userId, updateData, { new: true });
+      const user = await this.model.findOneAndUpdate(
+        { _id: userId, estado: 'active' },
+        updateData,
+        { new: true }
+
+      ).select('-password');
+
       if (!user) {
-        return null;
+        return null; // No encontrado o ya estaba inactivo
       }
       return user;
     } catch (error) {
@@ -76,6 +88,28 @@ class UserService {
       throw error;
     }
   }
+
+  /**
+ * Realiza un Borrado Lógico (Soft Delete) cambiando el estado a 'inactive'.
+ * @param {string} userId - ID del usuario a "eliminar".
+ * @returns {Promise<object | null>} Usuario con estado 'inactive' o null.
+ */
+  async delete(userId) {
+    try {
+      const deletedUser = await this.model.findOneAndUpdate(
+        { _id: userId, estado: 'active' }, // Condición: solo borrar si está activo
+        { estado: 'inactive' },
+        { new: true }
+      ).select('-password'); // Excluir la contraseña
+
+      return deletedUser;
+    } catch (error) {
+      console.error("Error al realizar borrado lógico:", error);
+      throw error;
+    }
+  }
+
+
 };
 
 export default new UserService();

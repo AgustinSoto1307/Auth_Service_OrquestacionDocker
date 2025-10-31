@@ -5,13 +5,25 @@ import UserService from '../services/userService.js';
 export const registerUser = async (req, res) => {
   try {
     const { nombre, email, password } = req.body;
+    // El servicio maneja el hash y guarda el usuario
     const savedUser = await UserService.register({ nombre, email, password });
-    res.status(201).json({ message: 'Usuario registrado con éxito', user: savedUser });
+    
+    // Devolvemos una respuesta limpia sin la contraseña hasheada
+    res.status(201).json({ 
+        message: 'Usuario registrado con éxito', 
+        user: {
+            id: savedUser._id,
+            email: savedUser.email,
+            nombre: savedUser.nombre
+        }
+    });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'El correo electrónico ya existe.' });
+      // 409 Conflict por email duplicado
+      return res.status(409).json({ message: 'El correo electrónico ya existe.' });
     }
-    res.status(500).json({ message: 'Error en el registro', error });
+    console.error("Error en el registro:", error);
+    res.status(500).json({ message: 'Error en el registro', error: error.message || error });
   }
 };
 
@@ -19,42 +31,84 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('✅ Datos recibidos para login:', { email, password });
+    console.log('Datos recibidos para login:', { email, password });
     const user = await UserService.login(email, password);
 
     if (!user) {
-      return res.status(401).json({ message: 'Correo o contraseña incorrectos.' });
+      return res.status(401).json(
+        { message: 'Correo o contraseña incorrectos.' }
+      );
     }
 
-    res.status(200).json({ message: 'Inicio de sesión exitoso.' });
+    res.status(200).json(
+      { message: 'Inicio de sesión exitoso.',
+        token: result.token, 
+        user: result.user
+     });
   } catch (error) {
     res.status(500).json({ message: 'Error en el inicio de sesión', error });
   }
 };
 
 
-//* OBTENER TODOS LOS USUARIOS
-export const getAllUsers = async (req, res) => {
+//* === 2. CONTROLADORES PROTEGIDOS (Usados en /users) ===
+
+//* OBTENER TODOS LOS USUARIOS (Solo Admin)
+export const getAllUsersController = async (req, res) => {
   try {
+    // El servicio ya filtra por estado 'active' y excluye la contraseña.
     const users = await UserService.getAll();
-    res.json(users);
+    res.status(200).json({ message: 'Lista de usuarios activos.', users: users });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error al obtener todos los usuarios:", error);
+    res.status(500).json({ message: 'Error al obtener usuarios', error: error.message });
   }
 };
 
-//*MODIFICACIÒN DE NOMBRE O MAIL
-export const updateUser = async (req, res) => {
+//* MODIFICACIÓN DE DATOS (Self-Service o Admin)
+ 
+export const updateUserController = async (req, res) => {
   try {
-    const { userId } = req.params;// <-- Aquí tomamos los datos del params :userID
-    const updateData = req.body; // <-- Aquí tomamos los datos del cuerpo
-    const user = await UserService.update(userId, updateData);
+    const userId = req.params.id; // Correcto: se espera 'id' del parámetro de ruta
+    const updateData = req.body; 
 
-    if (!user) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
+    const updatedUser = await UserService.update(userId, updateData);
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Usuario no encontrado o inactivo.' }); 
     }
-    res.status(200).json({ message: 'Usuario actualizado exitosamente', user });
+    
+    res.status(200).json({ 
+        message: 'Usuario actualizado exitosamente.', 
+        user: updatedUser 
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el usuario', error });
+    console.error("Error al actualizar el usuario:", error);
+    res.status(500).json({ message: 'Error al actualizar el usuario', error: error.message });
   }
+};
+
+//* ELIMINACIÓN LÓGICA (Solo Admin)
+export const deleteUserController = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        
+        const deletedUser = await UserService.delete(userId);
+
+        if (!deletedUser) {
+            return res.status(404).json({ message: 'Usuario no encontrado o ya estaba inactivo.' });
+        }
+
+        res.status(200).json({ 
+            message: 'Usuario eliminado lógicamente (estado: inactive).', 
+            user: {
+                id: deletedUser._id,
+                email: deletedUser.email,
+                estado: deletedUser.estado
+            }
+        });
+    } catch (error) {
+        console.error("Error al eliminar el usuario:", error);
+        res.status(500).json({ message: 'Error al procesar la eliminación', error: error.message });
+    }
 };
