@@ -1,41 +1,54 @@
 import { Router } from 'express';
-import { verifyToken } from '../middleware/auth.middleware.js'; 
-import { authorizeUser} from '../middleware/authorize.user.js';
-import UserService from '../services/user.service.js'; 
+import { verifyToken } from '../middleware/auth.middleware.js';
+import { authorizeUser } from '../middleware/authorize.user.js';
+import { authorizeRole } from '../middleware/authorize.role.js';
+import UserService from '../services/user.service.js';
+import {
+    getAllUsersController,
+    updateUserController,
+    deleteUserController
+} from '../controllers/user.controller.js';
 
 const router = Router();
 
-// 💡 RUTA PROTEGIDA: Solo usuarios con un token válido pueden acceder
+// === RUTAS DE GESTIÓN DE USUARIOS ===
+
+// 1. OBTENER TODOS LOS USUARIOS ACTIVOS (Listado)
+// Requiere: Token válido Y rol 'admin' o 'secretaria'
+router.get('/',
+    verifyToken,
+    // 💡 Aplica la autorización de rol múltiple
+    authorizeRole(['admin', 'secretaria']),
+    getAllUsersController
+);
+
 router.get('/profile', verifyToken, async (req, res) => {
-    
+
     const user = await UserService.findById(req.user.id);
 
     if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
-    
-    // La respuesta ya está sanitizada (sin contraseña) por el servicio.
-    return res.status(200).json({ 
+
+    return res.status(200).json({
         message: 'Acceso concedido al perfil.',
         user: user,
-        rol: user.rol // Usamos el rol que viene del objeto de la base de datos
+        rol: user.rol
     });
 });
 
-// Endpoint para actualizar el perfil: Requiere Autenticación Y Autorización
-// Ejemplo: PUT /api/users/65f4d1e0d37e29c0d3a7b5e4
-router.put('/:id', 
-    verifyToken,   // 1. Revisa el JWT
-    authorizeUser, // 2. Revisa si req.user.id coincide con req.params.id o si es admin
-    async (req, res) => {
-        try {
-            const updatedUser = await UserService.update(req.params.id, req.body);
-            if (!updatedUser) {
-                return res.status(404).json({ message: "Usuario no encontrado para actualizar." });
-            }
-            res.status(200).json({ message: "Usuario actualizado exitosamente.", user: updatedUser });
-        } catch (error) {
-            res.status(500).json({ message: "Error al actualizar.", error: error.message });
-        }
-    }
+// 3. ACTUALIZAR PERFIL
+// Permisos: Propietario del token, 'admin' o 'secretaria'.
+router.put('/:id',
+    verifyToken,
+    authorizeUser,
+    updateUserController
+);
+
+// 4. ELIMINACIÓN LÓGICA
+// Requiere: Token válido Y rol 'admin' o 'secretaria'
+router.delete('/:id',
+    verifyToken,
+    authorizeRole(['admin', 'secretaria']),
+    deleteUserController
 );
 
 export default router;

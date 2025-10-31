@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import { USER_ROLES } from '../config/const.js';
+
 
 // esquema de mongoose
 const usuarioSchema = new mongoose.Schema({
@@ -18,11 +20,26 @@ const usuarioSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-  }
+    select: false, //No se envía la contraseña en las consultas por defecto
+  },
+  //Rol para la autorización (RBAC)
+  rol: { 
+    type: String, 
+    enum: USER_ROLES, 
+    default: 'alumno',
+    required: true // El campo rol debe ser requerido para la autorización
+  }, 
+  //CAMPO AÑADIDO: Estado para el Borrado Lógico
+  estado: { 
+    type: String, 
+    enum: ['active', 'inactive'], 
+    default: 'active' 
+  }, 
   
 }, 
 {
   timestamps: true,
+  versionKey: false  //oculta el campo __V
 });
 
 //pre-save hook de mongoose mas seguridad al hashear las pass..
