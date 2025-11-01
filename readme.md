@@ -1,111 +1,169 @@
-# 🚀 Auth_Service: Guía de Arranque y Troubleshooting
+<div align="center">
 
-Este documento describe cómo levantar el entorno de desarrollo y la aplicación del microservicio de autenticación.  
-Utilizamos **Docker Compose** para orquestar la base de datos (MongoDB) y el cliente visual (mongo-client), mientras que el backend de Node.js se ejecuta de forma local para facilitar la depuración (`npm run dev`).
+# 🚀 Backend - APP ESCUELA - Microservicio de Auth_Service
+
+Microservicio backend desarrollado en **Node.js + Express**, encargado de la gestión de usuarios, materias, tareas y entregas.  
+Forma parte del ecosistema de microservicios del proyecto **APP ESCUELA**.
+
+![Node.js](https://img.shields.io/badge/Node.js-v18.0+-green?style=flat-square)
+![Express.js](https://img.shields.io/badge/Express.js-Framework-blue?style=flat-square)
+![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-brightgreen?style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=flat-square)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
+
+</div>
 
 ---
 
-## 🛠️ 1. Requisitos y Configuración Previa
+## 📚 Tabla de Contenidos
+1. [Descripción General](#-descripción-general)
+2. [Arquitectura y Tecnologías](#-arquitectura-y-tecnologías)
+3. [Estructura del Proyecto](#-estructura-del-proyecto)
+4. [Instalación y Ejecución](#️-instalación-y-ejecución)
+5. [Configuración de Entorno](#-configuración-de-entorno)
+6. [Endpoints Principales](#-endpoints-principales)
+7. [Buenas Prácticas y Estilo](#-buenas-prácticas-y-estilo)
+8. [Tests y Cobertura](#-tests-y-cobertura)
+9. [Contribución](#-contribución)
+10. [Licencia](#-licencia)
+11. [Autor](#-autor)
 
-Asegúrate de tener instalados:
+---
 
-- Docker Desktop (para los servicios de contenedores)
-- Node.js
-- Dependencias del proyecto
+## 🧠 Descripción General
 
-### 1.1. Modificación Crítica del Archivo `.env`
+Este backend provee servicios **RESTful** para la gestión académica:
 
-Para que tu aplicación local (`npm run dev`) pueda conectarse al contenedor de MongoDB, la variable `MONGODB_URI` debe apuntar a tu máquina anfitriona (`localhost`), ya que el puerto `27017` está expuesto por Docker:
+- Registro de usuarios (alumnos, profesores, administradores)
+- Administración de materias, tareas y entregas
+- Comunicación entre servicios mediante **HTTP y JSON**
 
-| Configuración | Valor Requerido |
-|---------------|----------------|
-| MONGODB_URI   | mongodb://localhost:27017/authdb |
+Diseñado bajo principios de **Clean Architecture** y separación por capas (**routes, controllers, services, models**).
 
-### 1.2. Instalación de Dependencias
+---
 
-Ejecuta este comando una sola vez para instalar todas las dependencias del proyecto:
+## 🏗️ Arquitectura y Tecnologías
+
+| Tecnología | Descripción |
+|-------------|--------------|
+| **Node.js** | Entorno de ejecución JavaScript |
+| **Express.js** | Framework para la creación de APIs REST |
+| **MongoDB / Mongoose** | Base de datos NoSQL y ODM |
+| **Docker** | Contenerización del entorno |
+| **Dotenv** | Gestión de variables de entorno |
+| **Jest / Supertest** | Pruebas unitarias y de integración |
+
+📐 **Patrón de diseño aplicado:** `MVC / Clean Architecture`
+
+---
+
+## 📁 Estructura del Proyecto
 
 ```bash
+src/
+ ├── config/          # Configuración general, variables de entorno y conexión DB
+ ├── controllers/     # Controladores (lógica de manejo de peticiones)
+ ├── routes/          # Definición de rutas de API (endpoints)
+ ├── services/        # Lógica de negocio y comunicación con la DB (core)
+ ├── models/          # Modelos y esquemas de Mongoose
+ ├── middlewares/     # Middlewares personalizados (Autenticación, Autorización)
+ ├── utils/           # Funciones auxiliares y manejo de errores
+ ├── index.js         # Punto de entrada del servidor
+
+
+
+⚙️ Instalación y Ejecución
+1️⃣ Clonar el repositorio
+git clone https://github.com/usuario/backend-app.git
+cd backend-app
+
+2️⃣ Instalar dependencias
 npm install
-2. Flujo de Arranque
-Sigue estos dos pasos para iniciar todo el entorno de desarrollo:
 
-Paso 1: Levantar los Servicios de Docker
-Ejecuta este comando en la raíz del proyecto para iniciar la base de datos (mongo-server) y el cliente visual (mongo-client):
+3️⃣ Configurar variables de entorno
 
-bash
-Copiar código
-docker-compose up -d mongo-server mongo-client
-Verificación: Asegúrate de que los contenedores estén en estado Up:
+Crea un archivo .env en la raíz del proyecto con el siguiente contenido:
 
-bash
-Copiar código
-docker-compose ps
-Acceso a la Base de Datos: Puedes acceder al cliente visual Mongo Express en http://localhost:8082.
+PORT=4000
+DB_URI=mongodb://localhost:27017/app_escuela
+JWT_SECRET=supersecreto_y_largo_aqui
 
-Paso 2: Arrancar el Backend (API de Node.js)
-Una vez que los contenedores estén listos, inicia tu aplicación de Node.js en modo desarrollo:
-
-bash
-Copiar código
+4️⃣ Ejecutar en desarrollo
 npm run dev
-Tu API ahora está corriendo en http://localhost:3001 y conectada a MongoDB a través de localhost:27017.
 
-3. Guía de Troubleshooting (Solución de Problemas Comunes)
-3.1. Error de Conexión: ECONNREFUSED / ENOTFOUND
-Error	Mensaje Visto	Causa Raíz	Solución
-getaddrinfo ENOTFOUND mongo-server	La aplicación local no puede resolver el nombre del host mongo-server.	La API se ejecuta fuera de Docker, pero usa un host interno de Docker.	Corregir el .env para usar localhost (ver sección 1.1).
-ECONNREFUSED 127.0.0.1:27017	La aplicación Node.js intenta conectarse, pero no hay un servicio escuchando.	El contenedor mongo-server no está levantado o no está exponiendo el puerto.	Asegurarse de que el docker-compose.yml mapee el puerto:
-yaml ports: - "27017:27017"
+5️⃣ Ejecutar en producción
+npm start
 
-3.2. Contenedor MongoDB Reiniciando (Restarting)
-Si el contenedor mongo-server entra en un bucle de reinicio, es probable que haya datos o permisos corruptos en el volumen persistente.
+🔒 Configuración de Entorno
 
-Comando de Solución:
+El proyecto usa la librería dotenv para cargar variables de entorno y realiza una validación estricta al inicio de la aplicación para asegurar la disponibilidad y el formato correcto de las variables críticas (DB_URI, JWT_SECRET, etc.).
 
-bash
-Copiar código
-docker-compose down -v
-Nota: Esto eliminará los datos persistentes. Luego vuelve al Paso 1 del flujo de arranque para iniciar la base de datos de forma limpia.
+🌐 Endpoints Principales
+Módulo	Método	Ruta	Descripción	Rol Requerido	Estado
+Auth	POST	/api/auth/register	Registrar nuevo usuario	Público	✅
+Auth	POST	/api/auth/login	Iniciar sesión y obtener JWT	Público	✅
+User	GET	/api/users/profile	Obtener perfil del usuario autenticado	User	✅
+User	GET	/api/users	Listar todos los usuarios activos	Admin / Secretaria	✅
+User	PUT	/api/users/:id	Actualizar datos de usuario	Admin / Self-Service	✅
+User	DELETE	/api/users/:id	Borrado lógico de usuario	Admin / Self-Service	✅
+Materia	GET	/api/materias	Listar materias	Profesor / Alumno	🚧
+Tarea	POST	/api/tareas	Crear nueva tarea	Profesor	🚧
+Entrega	POST	/api/entregas	Subir entrega	Alumno	🚧
+🧩 Buenas Prácticas y Estilo
 
-3.3. Error de Conflicto de Nombres o Puertos
-Conflicto de Nombres:
-Si recibes errores como Conflict. The container name "/mongo-server" is already in use:
+✅ Código estructurado por capas y responsabilidades (Controller, Service, Model)
+✅ Controladores livianos y servicios reutilizables
+✅ Validaciones de entrada con Joi o Express-validator
+✅ Logs centralizados para depuración
+✅ Cumple principios SOLID y Clean Code
+✅ Manejo de seguridad basado en JWT y middlewares por rol
 
-bash
-Copiar código
-docker rm -f <nombre-del-contenedor-en-conflicto>
-Conflicto de Puertos:
-Si el puerto está en uso (address already in use), detén el proceso conflictivo:
+🧪 Tests y Cobertura
 
-bash
-Copiar código
-sudo lsof -i :<puerto>
-sudo kill <PID>
-O cambia el puerto mapeado en docker-compose.yml:
+Ejecutar los tests con:
 
-yaml
-Copiar código
-ports:
-  - "8083:8082"
-4. Detener y Limpiar el Entorno
-Detener únicamente los servicios de Docker:
-
-bash
-Copiar código
-docker-compose stop
-Detener y eliminar contenedores, redes y volúmenes:
-
-bash
-Copiar código
-docker-compose down -v
-✅ Listo! Ahora tienes un entorno funcional y limpio para desarrollo y debugging.
-
-css
-Copiar código
+npm test
 
 
+Se incluyen pruebas unitarias y de integración utilizando Jest + Supertest.
+La cobertura puede generarse con:
 
+npm run test:coverage
+
+🤝 Contribución
+
+Crea una rama nueva desde develop
+
+Realiza tus cambios y ejecuta los tests
+
+Crea un Pull Request con descripción detallada
+
+Respeta las convenciones de commits y nombres de ramas
+
+Ejemplo:
+
+git checkout -b feature/nueva-funcionalidad
+
+📄 Licencia
+
+Este proyecto está bajo la licencia MIT.
+Consulta el archivo LICENSE
+ para más información.
+
+<div align="center">
+👨‍💻 Autor
+
+Ricardo Burdiles
+Desarrollador Backend | Node.js + Express
+
+📧 contacto: ricardo.burdiles@example.com
+
+🌐 GitHub: @ricardoburdiles
+
+⭐ Si este proyecto te fue útil, no olvides dejar una estrella en el repositorio.
+¡Gracias por tu apoyo! 🙌
+
+</div> ```
 
 
 
