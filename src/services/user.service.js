@@ -177,13 +177,17 @@ async syncAlumnosAndNotify() {
   async register(data) {
     console.log("Iniciando la función de registro...");
     try {
-      const { nombre, email, password, rol } = data;
+      // const { nombre, email, password, rol } = data;
+      // const newUser = new this.model({
+      //   nombre,
+      //   email,
+      //   password: password,
+      //   rol: rol,
+      // });
       const newUser = new this.model({
-        nombre,
-        email,
-        password: password,
-        rol: rol,
+        ...data, // Esto incluye nombre, email, password, rol, dni, id_externo_core, etc.
       });
+
 
       const savedUser = await newUser.save(); // <-- Aquí esperamos que se guarde.
       return savedUser; // <-- Devolvemos el usuario guardado.

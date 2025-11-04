@@ -4,9 +4,9 @@ import UserService from '../services/user.service.js';
 //*REGISTRO DE USUARIO NUEVO
 export const registerUser = async (req, res) => {
   try {
-    const { nombre, email, password } = req.body;
+    const { nombre, email, password, dni } = req.body;
     // El servicio maneja el hash y guarda el usuario
-    const savedUser = await UserService.register({ nombre, email, password });
+    const savedUser = await UserService.register({ nombre, email, password, dni });
     
     // Devolvemos una respuesta limpia sin la contraseña hasheada
     res.status(201).json({ 
@@ -14,7 +14,8 @@ export const registerUser = async (req, res) => {
         user: {
             id: savedUser._id,
             email: savedUser.email,
-            nombre: savedUser.nombre
+            nombre: savedUser.nombre,
+            dni: savedUser.dni
         }
     });
   } catch (error) {
