@@ -59,19 +59,6 @@ export const envs = {
 
     // Variables CTI - NOTIFICACIONES
     NOTIFICATION_SERVICE_URL: value.NOTIFICATION_SERVICE_URL,
-
-    // // Variables CTI - LOGS //variables anteriores
-    // AMQP_USER: value.AMQP_USER,
-    // AMQP_PASS: value.AMQP_PASS,
-    // AMQP_HOST: value.AMQP_HOST,
-    // AMQP_PORT: value.AMQP_PORT,
-    // AMQP_VHOST: value.AMQP_VHOST,
-    // AMQP_EXCHANGE: value.AMQP_EXCHANGE,
-    // AMQP_ROUTING_KEY: value.AMQP_ROUTING_KEY,
-    // MODULE_NAME: value.MODULE_NAME,
-    // LOG_LEVEL: value.LOG_LEVEL,
-    // VALIDATE: value.VALIDATE,
-    //testeo de variables----****/////
     amqpUser: value.AMQP_USER,          // Era AMQP_USER
     amqpPass: value.AMQP_PASS,          // Era AMQP_PASS
     amqpHost: value.AMQP_HOST,          // Era AMQP_HOST

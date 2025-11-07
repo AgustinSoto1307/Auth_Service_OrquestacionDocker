@@ -1,4 +1,4 @@
-import AmqpLogger from './AmqpLogger.service.js';
+// import AmqpLogger from './AmqpLogger.service.js';
 import { envs } from '../config/envs.js';
 
 /**
