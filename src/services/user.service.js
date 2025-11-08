@@ -2,12 +2,10 @@ import Usuario from '../models/User.entity.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { generateToken } from './jwt.service.js'
-// import AmqpLogger from './AmqpLogger.service.js';
 import { sendLog } from 'ds-logging-producer-kit';
 import CoreClientService from './CoreClient.service.js';
 import NotificationClientService from './notifyClient.service.js'; 
 import { envs } from '../config/envs.js';
-
 
 class UserService {
   constructor() {
@@ -199,36 +197,156 @@ async syncAlumnosAndNotify() {
     }
   }
   //////////////////////////////////////////////////// "testeo 4"  ////////////////////////////////////
-  async login(identifier, password, clientIp = "127.0.0.1") {
-  const logAttempt = async (level, message, context = {}) => {
-    try {
-      await sendLog({
-        level,
-        user: user?.email || identifier,
-        clientIp,  // ← Ahora sí usa la variable
-        message,
-        context
-      });
-    } catch (e) {
-      console.error("Error al enviar log:", e.message);
-    }
-  };
+//   async login(identifier, password, clientIp = "127.0.0.1") {
+//   const logAttempt = async (level, message, context = {}) => {
+//     try {
+//       await sendLog({
+//         level,
+//         user: user?.email || identifier,
+//         clientIp,  // ← Ahora sí usa la variable
+//         message,
+//         context
+//       });
+//     } catch (e) {
+//       console.error("Error al enviar log:", e.message);
+//     }
+//   };
 
+//   const isEmail = identifier.includes('@');
+//   const query = isEmail 
+//     ? { email: identifier, estado: 'active' }
+//     : { dni: identifier, estado: 'active' };
+  
+//   const user = await this.model.findOne(query).select('+password');
+  
+//   if (!user) {
+//     await logAttempt("WARN", "LOGIN_FAILED - Usuario no encontrado", { identifier });
+//     return null;
+//   }
+  
+//   const isMatch = await bcrypt.compare(password, user.password);
+
+//   if (!isMatch) {
+//     await logAttempt("WARN", "LOGIN_FAILED - Contraseña incorrecta", {
+//       userId: user._id.toString(),
+//       identifier
+//     });
+//     return null;
+//   }
+
+//   await logAttempt("INFO", "LOGIN_SUCCESS", {
+//     userId: user._id.toString(),
+//     rol: user.rol,
+//     module: envs.moduleName 
+//   });
+
+//   const userWithoutPassword = user.toObject();
+//   delete userWithoutPassword.password;
+//   const token = generateToken(userWithoutPassword);
+
+//   return { user: userWithoutPassword, token };
+// }
+  //////////////////////////////////////////////////////////////////////////
+//   async login(identifier, password, clientIp = "127.0.0.1") {
+//   // Primero buscar el usuario
+//   const isEmail = identifier.includes('@');
+//   const query = isEmail 
+//     ? { email: identifier, estado: 'active' }
+//     : { dni: identifier, estado: 'active' };
+  
+//   const user = await this.model.findOne(query).select('+password');
+  
+//   // Ahora definir logAttempt cuando ya tenemos user
+//   const logAttempt = async (level, message, context = {}) => {
+//     try {
+//       await sendLog({
+//         level,
+//         user: user?.email || identifier,  // ← Ahora sí existe user
+//         clientIp,
+//         message,
+//         context
+//       });
+//     } catch (e) {
+//       console.error("Error al enviar log:", e.message);
+//     }
+//   };
+  
+//   if (!user) {
+//     await logAttempt("WARN", "LOGIN_FAILED - Usuario no encontrado", { identifier });
+//     return null;
+//   }
+
+//   const isMatch = await bcrypt.compare(password, user.password);
+
+//   if (!isMatch) {
+//     await logAttempt("WARN", "LOGIN_FAILED - Contraseña incorrecta", {
+//       userId: user._id.toString(),
+//       identifier
+//     });
+//     return null;
+//   }
+
+//   await logAttempt("INFO", "LOGIN_SUCCESS", {
+//     userId: user._id.toString(),
+//     rol: user.rol,
+//     module: envs.moduleName 
+//   });
+
+//   const userWithoutPassword = user.toObject();
+//   delete userWithoutPassword.password;
+//   const token = generateToken(userWithoutPassword);
+
+//   return { user: userWithoutPassword, token };
+// }
+//////////////////////////////////////////////////"testeo 5" ///////////////////7////////////////////////////////
+async login(identifier, password, clientIp = "127.0.0.1") {
+  console.log("🔐 [LOGIN] Iniciando proceso de login para:", identifier);
+  
+  // Primero buscar el usuario
   const isEmail = identifier.includes('@');
   const query = isEmail 
     ? { email: identifier, estado: 'active' }
     : { dni: identifier, estado: 'active' };
   
+  console.log("🔍 [LOGIN] Buscando usuario con query:", query);
   const user = await this.model.findOne(query).select('+password');
   
+  console.log("👤 [LOGIN] Usuario encontrado:", user ? `Sí (${user.email})` : "No");
+  
+  // Ahora definir logAttempt cuando ya tenemos user
+  const logAttempt = async (level, message, context = {}) => {
+    console.log(`📝 [LOGIN] Intentando enviar log: ${level} - ${message}`);
+    try {
+      const logData = {
+        level,
+        user: user?.email || identifier,
+        clientIp,
+        message,
+        context
+      };
+      console.log("📤 [LOGIN] Datos del log a enviar:", JSON.stringify(logData, null, 2));
+      
+      await sendLog(logData);
+      
+      console.log("✅ [LOGIN] Log enviado exitosamente");
+    } catch (e) {
+      console.error("❌ [LOGIN] Error al enviar log:", e.message);
+      console.error("❌ [LOGIN] Stack completo:", e.stack);
+    }
+  };
+  
   if (!user) {
+    console.log("⚠️ [LOGIN] Usuario no encontrado, enviando log...");
     await logAttempt("WARN", "LOGIN_FAILED - Usuario no encontrado", { identifier });
     return null;
   }
-  
+
+  console.log("🔑 [LOGIN] Verificando contraseña...");
   const isMatch = await bcrypt.compare(password, user.password);
+  console.log("🔑 [LOGIN] Contraseña válida:", isMatch ? "Sí" : "No");
 
   if (!isMatch) {
+    console.log("⚠️ [LOGIN] Contraseña incorrecta, enviando log...");
     await logAttempt("WARN", "LOGIN_FAILED - Contraseña incorrecta", {
       userId: user._id.toString(),
       identifier
@@ -236,6 +354,7 @@ async syncAlumnosAndNotify() {
     return null;
   }
 
+  console.log("✅ [LOGIN] Login exitoso, enviando log...");
   await logAttempt("INFO", "LOGIN_SUCCESS", {
     userId: user._id.toString(),
     rol: user.rol,
@@ -246,9 +365,10 @@ async syncAlumnosAndNotify() {
   delete userWithoutPassword.password;
   const token = generateToken(userWithoutPassword);
 
+  console.log("🎫 [LOGIN] Token generado, retornando respuesta");
   return { user: userWithoutPassword, token };
 }
-  
+///////////////////////////////////////////////////////////////////////////////////////////////////7
   async getAll() {
     //Filtrar solo usuarios 'active' y excluir la contraseña
     return this.model.find({ estado: 'active' }).select('-password');
@@ -259,8 +379,6 @@ async syncAlumnosAndNotify() {
      * @param {object} updateData - Datos a modificar.
      * @returns {Promise<object | null>} Usuario actualizado o null.
      */
-
-
 
   //* modificar nombre usuario 
   async update(userId, updateData) {
