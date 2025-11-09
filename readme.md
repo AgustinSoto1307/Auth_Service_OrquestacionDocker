@@ -35,7 +35,7 @@ Forma parte del ecosistema de microservicios del proyecto **APP ITS Cipolletti**
 
 Este backend provee servicios **RESTful** para la gestión académica:
 
-- <span style="font-weight:bold; color:red" >Registro de usuarios (alumnos, profesores,secretarias, administradores).</span>
+- <span style="font-weight:bold; color:red" >No corresponde a este módulo pero lo hace-> Registro de usuarios(alumnos, profesores,secretarias, administradores).</span>
 - Verifica la identidad de un usuario para otorgarle acceso a un sistema.
 - Validacion de credenciales que el usuario proporciona.
 - El servicio emite tokens de acceso y gestiona sesiones de usuario.
