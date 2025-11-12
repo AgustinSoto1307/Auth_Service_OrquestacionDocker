@@ -1,8 +1,22 @@
-version: '3.9'
+version: "3.9"
+
 services:
-  mongo-server:
+  auth-service:
+    build: .
+    container_name: auth-service
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env  # ← AGREGAR ESTA LÍNEA para cargar el .env
+    networks:
+      - mongodb_network
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
     image: mongo:4.4
-    container_name: mongo-server
+    container_name: mongo
     restart: always
     ports:
       - "27017:27017"
@@ -10,14 +24,15 @@ services:
       - mongodb_data:/data/db
     networks:
       - mongodb_network
+
   mongo-client:
     image: mongo-express:latest
     container_name: mongo-client
     restart: always
     depends_on:
-      - mongo-server
+      - mongo
     environment:
-      - ME_CONFIG_MONGODB_SERVER=mongo-server
+      - ME_CONFIG_MONGODB_SERVER=mongo
       - ME_CONFIG_MONGODB_PORT=27017
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - ME_CONFIG_BASICAUTH_USERNAME=admin
@@ -27,7 +42,10 @@ services:
       - "8082:8081"
     networks:
       - mongodb_network
+
 volumes:
   mongodb_data:
+
 networks:
   mongodb_network:
+    driver: bridge

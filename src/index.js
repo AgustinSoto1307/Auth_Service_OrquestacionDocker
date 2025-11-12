@@ -1,7 +1,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 import mongoose from 'mongoose';
-import { initProducer, closeProducer } from 'ds-logging-producer-kit';
+// import { initProducer, closeProducer } from 'ds-logging-producer-kit';
 import { envs } from './config/envs.js';
 import app from './app.js';
 
@@ -24,19 +24,19 @@ const main = async () => {
         await mongoose.connect(envs.MONGODB_URI);
         
         // 2. Inicializar Producer de Logs con CREDENCIALES DEL AUTH_SERVICE
-        await initProducer({
-            AMQP_USER: envs.amqpUser,
-            AMQP_PASS: envs.amqpPass,
-            AMQP_HOST: envs.amqpHost,
-            AMQP_PORT: envs.amqpPort,
-            AMQP_VHOST: envs.amqpVhost,
-            AMQP_EXCHANGE: envs.amqpExchange,
-            AMQP_ROUTING_KEY: envs.amqpRoutingKey,
-            MODULE_NAME: envs.moduleName,
-            VALIDATE: envs.validateLogs
-        });
+        // await initProducer({
+        //     AMQP_USER: envs.amqpUser,
+        //     AMQP_PASS: envs.amqpPass,
+        //     AMQP_HOST: envs.amqpHost,
+        //     AMQP_PORT: envs.amqpPort,
+        //     AMQP_VHOST: envs.amqpVhost,
+        //     AMQP_EXCHANGE: envs.amqpExchange,
+        //     AMQP_ROUTING_KEY: envs.amqpRoutingKey,
+        //     MODULE_NAME: envs.moduleName,
+        //     VALIDATE: envs.validateLogs
+        // });
         
-        console.log('✅ Logger Producer inicializado y conectado a RabbitMQ');
+        console.log('✅ Logger deshabilitado');
 
         // 3. Iniciar el servidor Express
         const port = envs.PORT;
@@ -57,7 +57,7 @@ main();
 const safeClose = async () => {
     try {
         console.log('\n🛑 Cerrando servidor...');
-        await closeProducer();
+        // await closeProducer();
         await mongoose.disconnect();
         console.log('✅ Conexiones cerradas correctamente');
     } catch (err) {

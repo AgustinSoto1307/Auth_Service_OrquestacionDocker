@@ -2,7 +2,7 @@ import Usuario from '../models/User.entity.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { generateToken } from './jwt.service.js'
-import { sendLog } from 'ds-logging-producer-kit';
+// import { sendLog } from 'ds-logging-producer-kit';
 import CoreClientService from './CoreClient.service.js';
 import NotificationClientService from './notifyClient.service.js'; 
 import { envs } from '../config/envs.js';
@@ -212,23 +212,23 @@ async login(identifier, password, clientIp = "127.0.0.1") {
   // Ahora definir logAttempt cuando ya tenemos user
   const logAttempt = async (level, message, context = {}) => {
     console.log(`📝 [LOGIN] Intentando enviar log: ${level} - ${message}`);
-    try {
-      const logData = {
-        level,
-        user: user?.email || identifier,
-        clientIp,
-        message,
-        context
-      };
+    // try {
+    //   // const logData = {
+    //   //   level,
+    //   //   user: user?.email || identifier,
+    //   //   clientIp,
+    //   //   message,
+    //   //   context
+    //   };
       console.log("📤 [LOGIN] Datos del log a enviar:", JSON.stringify(logData, null, 2));
       
-      await sendLog(logData);
+      // await sendLog(logData);
       
       console.log("✅ [LOGIN] Log enviado exitosamente");
-    } catch (e) {
-      console.error("❌ [LOGIN] Error al enviar log:", e.message);
-      console.error("❌ [LOGIN] Stack completo:", e.stack);
-    }
+    // } catch (e) {
+    //   console.error("❌ [LOGIN] Error al enviar log:", e.message);
+    //   console.error("❌ [LOGIN] Stack completo:", e.stack);
+    // }
   };
   
   if (!user) {
