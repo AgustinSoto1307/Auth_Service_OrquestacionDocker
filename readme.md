@@ -92,7 +92,7 @@ src/
 git clone https://github.com/orbitrymusic/tpOrquestacionDocker2025.git
 ```
 
-2️⃣ Moverse al directorio Auth_Service.
+2️⃣ Moverse al directorio tpOrquestacionDocker2025.
 
 ``` bash
 cd tpOrquestacionDocker2025
