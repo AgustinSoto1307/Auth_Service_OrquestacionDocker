@@ -1,7 +1,7 @@
 
 <div align="center">
 
-# 🚀 APP ITS Cipolletti - Microservicio: Authentication Service - Backend  
+# 🤓 APP ITS Cipolletti - Microservicio: Authentication Service - Backend  
 
 Microservicio de autenticación backend desarrollado en **Node.js + Express**, encargado de verificar la identidad de un usuario para otorgarle acceso a un sistema, validando credenciales que el usuario proporciona. 
 Forma parte del ecosistema de microservicios del proyecto **APP ITS Cipolletti**, desarrollado con el grupo DIV < H1>. En este contexto presentado en un contenedor Docker para la materia LaboratorioII FSD.
