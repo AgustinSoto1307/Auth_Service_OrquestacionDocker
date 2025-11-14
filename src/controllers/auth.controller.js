@@ -3,21 +3,46 @@ import UserService from '../services/user.service.js';
 // Asumo que tienes una función para manejar errores estandarizados
 // import { handleError } from '../utils/handleError.js';
 
+// export const loginController = async (req, res) => {
+//     const { email, password } = req.body;
+//     const clientIp = req.ip || req.connection.remoteAddress //test  nuevo
+//     // TODO: Validación de entrada (Joi o Express-Validator)
+
+//     try {
+//         const result = await UserService.login(email, password, clientIp);
+
+//         if (!result) {
+//             // Falla de autenticación (usuario no encontrado o contraseña incorrecta)
+//             return res.status(401).json({ error: 'Credenciales inválidas.' });
+//         }
+
+//         // Éxito: enviar el token al cliente.
+//         // No es necesario enviar el objeto user en el body, solo el token.
+//         return res.status(200).json({
+//             message: 'Login exitoso.',
+//             token: result.token,
+//             user: result.user
+//         });
+
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ error: 'Error interno del servidor durante el login.' });
+//     }
+// };
 export const loginController = async (req, res) => {
-    const { email, password } = req.body;
-    const clientIp = req.ip || req.connection.remoteAddress //test  nuevo
-    // TODO: Validación de entrada (Joi o Express-Validator)
+    const { dni, password } = req.body;
+
+    if (!dni || !password) {
+        return res.status(400).json({ error: 'Se requiere DNI y contraseña.' });
+    }
 
     try {
-        const result = await UserService.login(email, password, clientIp);
+        const result = await UserService.login(dni, password);
 
         if (!result) {
-            // Falla de autenticación (usuario no encontrado o contraseña incorrecta)
             return res.status(401).json({ error: 'Credenciales inválidas.' });
         }
 
-        // Éxito: enviar el token al cliente.
-        // No es necesario enviar el objeto user en el body, solo el token.
         return res.status(200).json({
             message: 'Login exitoso.',
             token: result.token,
@@ -25,11 +50,10 @@ export const loginController = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error('Error en loginController:', error);
         return res.status(500).json({ error: 'Error interno del servidor durante el login.' });
     }
 };
-
 //Controlador para el registro de nuevos usuarios
 export const registerController = async (req, res) => {
 
