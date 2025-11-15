@@ -19,18 +19,18 @@ Además, este microservicio implementa prácticas modernas de arquitectura backe
 
 ---
 
-## 📚 Tabla de Contenidos
+## 📚 Tabla de Contenidos Importantes
 - [🤓 APP ITS Cipolletti - Microservicio: Authentication Service - Backend](#-app-its-cipolletti---microservicio-authentication-service---backend)
-  - [📚 Tabla de Contenidos](#-tabla-de-contenidos)
-  - [🎓 Contexto Académico](#-contexto-académico)
-  - [📋 Descripción General](#-descripción-general)
-  - [🏗️ Arquitectura y Tecnologías](#️-arquitectura-y-tecnologías)
-  - [📁 Estructura del Proyecto](#-estructura-del-proyecto)
-  - [🐋 Instalación y Ejecución con Docker](#-instalación-y-ejecución-con-docker)
+  - [📚 Tabla de Contenidos Importantes](#-tabla-de-contenidos-importantes)
+  - [🎓 Contexto del módulo](#-contexto-del-módulo)
+  - [📋 Descripción General del backend](#-descripción-general-del-backend)
+  - [🏗️ Arquitectura y Tecnologías usadas durante la realización](#️-arquitectura-y-tecnologías-usadas-durante-la-realización)
+  - [📁 La Estructura del Proyecto](#-la-estructura-del-proyecto)
+  - [🐋 Realización de la Instalación y Ejecución con Docker](#-realización-de-la-instalación-y-ejecución-con-docker)
 
 ---
 
-## 🎓 Contexto Académico
+## 🎓 Contexto del módulo
 
 Este módulo fue desarrollado como parte de la evaluación práctica de la asignatura, donde se requiere implementar un microservicio funcional utilizando contenedores Docker y las herramientas del ecosistema Node.js. El objetivo académico incluye aplicar buenas prácticas, documentar correctamente el proyecto y comprender la arquitectura basada en microservicios dentro del contexto de la aplicación APP ITS Cipolletti.
 
@@ -44,7 +44,7 @@ Este módulo fue desarrollado como parte de la evaluación práctica de la asign
 
 ---
 
-## 📋 Descripción General
+## 📋 Descripción General del backend
 
 Este backend implementa un microservicio de **autenticación y gestión de identidad**, encargado de administrar el acceso de usuarios dentro del ecosistema APP ITS Cipolletti. Brinda servicios **RESTful** orientados al control de identidad, la validación de credenciales y la emisión de tokens seguros.
 
@@ -62,7 +62,7 @@ El microservicio está diseñado siguiendo los principios de **Clean Architectur
 
 ---
 
-## 🏗️ Arquitectura y Tecnologías
+## 🏗️ Arquitectura y Tecnologías usadas durante la realización
 
 | Tecnología | Descripción |
 |-------------|--------------|
@@ -77,7 +77,7 @@ El microservicio está diseñado siguiendo los principios de **Clean Architectur
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 La Estructura del Proyecto
 
 ```bash
 src/
@@ -95,7 +95,7 @@ src/
 
 ```
 
-## 🐋 Instalación y Ejecución con Docker
+## 🐋 Realización de la Instalación y Ejecución con Docker
 
 1️⃣ **Clonar el repositorio del proyecto con el link de GitHub**  
 Antes de comenzar, descargá el código fuente utilizando Git. Esto te permitirá trabajar con la última versión disponible.
@@ -131,11 +131,12 @@ CORE_API_KEY=
 NOTIFICATION_SERVICE_URL=http://notifications-service:5000
 MODULE_NAME=auth-service
 VALIDATE=false
+```
 
+Descripción de variables:
 JWT_SECRET: usá un valor largo y aleatorio para tokens más seguros.
 PORT: puede ser 3000, 4000 u otro puerto no utilizado.
 NODE_ENV: generalmente development durante la etapa de pruebas.
-```
 
 5️⃣ Reiniciar el entorno Docker y construir los servicios. 
 Antes de iniciar los contenedores, es recomendable limpiar cualquier ejecución previa para evitar conflictos con volúmenes o imágenes antiguas usando los siguientes comandos:
