@@ -152,8 +152,8 @@ Descarga y levanta la base de datos MongoDB
 Crea la imagen del Auth-Service
 Inicia ambos contenedores y los conecta en una misma red interna
 
-6️⃣ Registrar usuarios mediante Postman
-Con el servicio funcionando, podés utilizar Postman para crear usuarios nuevos a través del endpoint de registro.
+6️⃣ Registrar usuarios mediante Postman.
+con el servicio funcionando, podés utilizar Postman para crear usuarios nuevos a través del endpoint de registro.
 
 Roles permitidos en el sistema backend:
 - admin
@@ -164,7 +164,23 @@ Roles permitidos en el sistema backend:
 <br/> <img src="./assets/1.jpg" width="800" />
 <br/><br/>
 
-7️⃣ Una vez registrado un usuario con los roles, utiliza el endpoint en Postman para iniciar sesion correctamente, utilizando el metodo POST, ingresando:
+7️⃣ Iniciar sesión en Postman (POST)
+Una vez que el usuario fue registrado correctamente y tiene sus roles asignados, podés proceder a iniciar sesión utilizando el endpoint correspondiente. Para ello, en Postman:
+1. Seleccioná el método POST.
+
+2. Ingresá la URL del endpoint de autenticación (por ejemplo: /api/auth/login).
+
+3. En la pestaña Body, elegí raw → JSON.
+
+4. Enviá un objeto con las credenciales del usuario:
+```bash
+{
+  "dni": "DNI_DEL_USUARIO",
+  "password": "CONTRASEÑA_REGISTRADA"
+}
+```
+
+Ingresa:
 - DNI del usuario
 - Contraseña establecida en el registro </br></br>
 
